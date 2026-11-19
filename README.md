@@ -1,6 +1,6 @@
 # ESP32-S3 Internet Radio (HLS + Global Community Radio)
-![Front Touchscreen UI](front_ui.jpg)
-![ESP32-S3 and PCM5102A Hardware](hardware_rear.jpg)
+![Front Touchscreen UI](TouchScreen.jpg)
+
 
 
 A self-contained, SD-card-free Internet Radio built on the **ESP32-S3 N16R8** (16MB Flash + 8MB OPI PSRAM), pairing a **PCM5102A** I2S stereo DAC with a 2.8" **ILI9341** (320×240) **XPT2046** resistive touchscreen display.
