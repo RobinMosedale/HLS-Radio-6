@@ -4,8 +4,6 @@
 #include "BbcSearch.h"
 #include "RadioBrowser.h"
 
-
-
 // WHAT: Renders the SoftAP hotspot name and IP address on the ILI9341 during setup mode.
 void WiFiPortal::displayBeaconScreen(const char* apName, const IPAddress& ip) {
     _tft.fillScreen(TFT_BLACK);
@@ -62,10 +60,10 @@ String WiFiPortal::buildHtmlPage() {
     }
     html += HTML_FOOT;
     html += PORTAL_JS;
+    html += PORTAL_RB_JS;
     html += "</body></html>";
     return html;
 }
-
 
 // WHAT: Binds all HTTP GET/POST endpoints and file-upload callbacks on _server.
 void WiFiPortal::setupRoutes() {
@@ -140,3 +138,4 @@ void WiFiPortal::startWebServer() {
 void WiFiPortal::handleClient() {
     _server.handleClient();
 }
+// END OF FILE

@@ -2,6 +2,7 @@
 #define PORTAL_ASSETS_H
 
 #include <Arduino.h>
+#include "PortalRbJs.h"
 
 const char PORTAL_CSS[] PROGMEM = R"rawliteral(
   * { box-sizing: border-box; }
@@ -21,14 +22,14 @@ const char PORTAL_CSS[] PROGMEM = R"rawliteral(
   .hint { font-size: 12px; color: #888; margin: 4px 0 0 0; }
   select, input[type=text], input[type=password], input[type=file] { width: 100%; padding: 10px; margin-top: 5px; border-radius: 4px; border: 1px solid #444; background: #2c2c2c; color: #fff; font-size: 14px; }
   .row { display: flex; gap: 8px; margin-top: 6px; }
-  .row-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
-  .col-3 { flex: 1 1 130px; min-width: 0; }
   .btn { width: 100%; padding: 11px; margin-top: 14px; background: #0288d1; color: #fff; border: none; border-radius: 4px; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; display: inline-block; }
-  .btn-green { background: #2e7d32; }
-  .btn-teal { background: #00897b; }
-  .btn-orange { background: #ef6c00; }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-green { background: #2e7d32; } .btn-teal { background: #00897b; } .btn-orange { background: #ef6c00; }
   .btn-slate { background: #37474f; margin-top: 8px; padding: 8px; font-size: 13px; }
-  .btn-inline { width: auto; margin-top: 5px; padding: 10px 18px; white-space: nowrap; }
+  .btn-inline { width: auto; margin-top: 5px; padding: 10px 14px; white-space: nowrap; }
+  .aud-bar { margin-top: 12px; padding: 12px; background: #16262e; border: 1px solid #0288d1; border-radius: 6px; }
+  .aud-title { font-size: 13px; font-weight: bold; color: #4fc3f7; margin-bottom: 6px; }
+  .warn-banner { margin: 8px 0; padding: 8px 10px; background: #3e2723; border: 1px solid #ff7043; border-radius: 4px; color: #ffccbc; font-size: 12px; font-weight: bold; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   td { padding: 8px 6px; border-bottom: 1px solid #333; vertical-align: middle; }
   .fav-acts { display: flex; gap: 4px; justify-content: flex-end; align-items: center; }
@@ -40,6 +41,7 @@ const char PORTAL_CSS[] PROGMEM = R"rawliteral(
 const char PORTAL_JS[] PROGMEM = R"rawliteral(
 <script>
 let bbcList = [];
+let favsFull = false;
 function escHtml(s) {
   return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
@@ -50,11 +52,15 @@ function showTab(id, btn) {
   if (btn) btn.classList.add('active');
   localStorage.setItem('radioTab', id);
 }
+function updateAppendAvailability() {
+  const appBtn = document.getElementById('btnRbAppend');
+  const banner = document.getElementById('rbFullBanner');
+  if (appBtn) appBtn.disabled = favsFull;
+  if (banner) banner.style.display = favsFull ? 'block' : 'none';
+}
 function renderBbc(items) {
   const sel = document.getElementById('bbcSel');
-  sel.innerHTML = items.length
-    ? items.map((s, i) => `<option value="${i}">${escHtml(s.name)}</option>`).join('')
-    : '<option value="">No matching stations</option>';
+  sel.innerHTML = items.length ? items.map((s, i) => `<option value="${i}">${escHtml(s.name)}</option>`).join('') : '<option value="">No matching stations</option>';
   sel._items = items;
 }
 function filterBbc() {
@@ -70,100 +76,32 @@ async function loadFavs() {
     document.getElementById('favTbl').innerHTML = favs.map((f, i) => {
       const ok = f && f.name && f.name.length > 0;
       if (!ok && firstEmpty === -1) firstEmpty = i;
-      const upDis = (i === 0) ? 'disabled' : '';
-      const dnDis = (i >= activeCount - 1) ? 'disabled' : '';
-      const acts = ok ? `<div class="fav-acts">
-        <button class="btn-mv" ${upDis} onclick="moveFav(${i},-1)" title="Move Up">&uarr;</button>
-        <button class="btn-mv" ${dnDis} onclick="moveFav(${i},1)" title="Move Down">&darr;</button>
-        <button class="del" onclick="clearFav(${i})">Del</button>
-      </div>` : '';
-      return `<tr><td style="width:40px;"><strong>#${i + 1}</strong></td>
-        <td>${ok ? escHtml(f.name) : '<em style="color:#777;">Empty Slot</em>'}</td>
-        <td style="text-align:right;">${acts}</td></tr>`;
+      const acts = ok ? `<div class="fav-acts"><button class="btn-mv" ${i===0?'disabled':''} onclick="moveFav(${i},-1)">&uarr;</button><button class="btn-mv" ${i>=activeCount-1?'disabled':''} onclick="moveFav(${i},1)">&darr;</button><button class="del" onclick="clearFav(${i})">Del</button></div>` : '';
+      return `<tr><td style="width:40px;"><strong>#${i + 1}</strong></td><td>${ok ? escHtml(f.name) : '<em style="color:#777;">Empty Slot</em>'}</td><td style="text-align:right;">${acts}</td></tr>`;
     }).join('');
+    favsFull = (firstEmpty === -1);
+    updateAppendAvailability();
     const slotSel = document.getElementById('favSlotSel');
     if (slotSel && firstEmpty !== -1) slotSel.value = String(firstEmpty);
   } catch (e) {}
 }
 async function loadBbc() {
-  try {
-    const r = await fetch('/bbc_search?q=');
-    bbcList = await r.json();
-    renderBbc(bbcList);
-  } catch (e) {
-    document.getElementById('bbcSel').innerHTML = '<option value="">Failed to load BBC Gist</option>';
-  }
+  try { const r = await fetch('/bbc_search?q='); bbcList = await r.json(); renderBbc(bbcList); }
+  catch (e) { document.getElementById('bbcSel').innerHTML = '<option value="">Failed to load BBC Gist</option>'; }
 }
 async function saveSelected() {
   const sel = document.getElementById('bbcSel');
   const item = sel._items && sel._items[sel.value];
   if (!item) return;
-  const slot = document.getElementById('favSlotSel').value;
-  await fetch('/fav_save?slot=' + slot + '&name=' + encodeURIComponent(item.name) + '&url=' + encodeURIComponent(item.url), {method:'POST'});
+  await fetch('/fav_save?slot=' + document.getElementById('favSlotSel').value + '&name=' + encodeURIComponent(item.name) + '&url=' + encodeURIComponent(item.url), {method:'POST'});
   loadFavs();
 }
-async function moveFav(slot, dir) {
-  await fetch('/fav_move?slot=' + slot + '&dir=' + dir);
-  loadFavs();
-}
-async function clearFav(slot) {
-  await fetch('/fav_clear?slot=' + slot);
-  loadFavs();
-}
-async function initRadioBrowser() {
-  const fill = async (type, elId, valKey, labelKey, anyTxt) => {
-    try {
-      const res = await fetch('/rb_meta?type=' + type);
-      const arr = await res.json();
-      const sel = document.getElementById(elId);
-      sel.innerHTML = `<option value="">${anyTxt}</option>` +
-        arr.map(x => `<option value="${escHtml(x[valKey])}">${escHtml(x[labelKey])} (${x.stationcount})</option>`).join('');
-    } catch (e) {}
-  };
-  await fill('countries', 'rbCountry', 'iso_3166_1', 'name', 'Any Country');
-  await fill('tags',      'rbTag',     'name',       'name', 'Any Genre');
-  await fill('langs',     'rbLang',    'name',       'name', 'Any Language');
-}
-async function searchRb() {
-  const sel = document.getElementById('rbSel');
-  sel.innerHTML = '<option value="">Searching radio-browser.info...</option>';
-  const c = encodeURIComponent(document.getElementById('rbCountry').value);
-  const t = encodeURIComponent(document.getElementById('rbTag').value);
-  const l = encodeURIComponent(document.getElementById('rbLang').value);
-  const q = encodeURIComponent(document.getElementById('rbQ').value.trim());
-  try {
-    const res = await fetch(`/rb_search?country=${c}&tag=${t}&lang=${l}&q=${q}`);
-    const list = await res.json();
-    sel._items = list;
-    sel.innerHTML = list.length
-      ? list.map((s, i) => {
-          const info = [s.codec, s.bitrate ? s.bitrate + 'k' : ''].filter(Boolean).join(' ');
-          const lbl = info ? `${s.name} [${info}]` : s.name;
-          return `<option value="${i}">${escHtml(lbl)}</option>`;
-        }).join('')
-      : '<option value="">No matching stations</option>';
-  } catch (e) {
-    sel.innerHTML = '<option value="">Search failed</option>';
-  }
-}
-async function saveRbSelected() {
-  const sel = document.getElementById('rbSel');
-  const item = sel._items && sel._items[sel.value];
-  if (!item) return;
-  const url = item.url_resolved || item.url;
-  if (!url) return;
-  const slot = document.getElementById('favSlotSel').value;
-  const name = item.name.substring(0, 31);
-  await fetch('/fav_save?slot=' + slot + '&name=' + encodeURIComponent(name) + '&url=' + encodeURIComponent(url), {method:'POST'});
-  loadFavs();
-}
+async function moveFav(slot, dir) { await fetch('/fav_move?slot=' + slot + '&dir=' + dir); loadFavs(); }
+async function clearFav(slot) { await fetch('/fav_clear?slot=' + slot); loadFavs(); }
 window.onload = () => {
-  const saved = localStorage.getItem('radioTab') || 'tabFavs';
-  const btn = document.querySelector(`[data-tab="${saved}"]`);
-  showTab(saved, btn);
-  loadFavs();
-  loadBbc();
-  initRadioBrowser();
+  const saved = localStorage.getItem('radioTab');
+  if (saved && document.getElementById(saved)) showTab(saved, document.querySelector(`.tab[data-tab="${saved}"]`));
+  loadFavs(); loadBbc(); onRbModeChange(); syncAuditionState();
 };
 </script>
 )rawliteral";

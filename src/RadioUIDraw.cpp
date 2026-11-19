@@ -1,4 +1,5 @@
 #include "RadioUI.h"
+#include "RadioAudition.h"
 #include <examples/Smooth Fonts/FLASH_Array/Font_Demo_1_Array/NotoSansBold15.h>
 #include <examples/Smooth Fonts/FLASH_Array/Font_Demo_1_Array/NotoSansBold36.h>
 #include <WiFi.h>
@@ -113,15 +114,18 @@ void RadioUI::drawVuBars() {
 }
 
 // WHAT: Draws central station card with 36px/26px auto-sized title and metadata.
-// WHEN: Called on screen load, station change, or new stream metadata arrival.
+// WHEN: Called on screen load, station change, audition toggle, or metadata arrival.
 void RadioUI::drawStationCard() {
+    bool isPreview = RadioAudition::isActive();
     int favIdx = _cfg.getActiveFavIndex();
     const FavStation& st = _cfg.getFavourite(favIdx);
 
     _tft.fillRoundRect(8, 40, 304, 74, 8, COL_CARD);
-    _tft.drawRoundRect(8, 40, 304, 74, 8, COL_ACCENT);
+    _tft.drawRoundRect(8, 40, 304, 74, 8, isPreview ? TFT_ORANGE : COL_ACCENT);
 
-    String title = (strlen(st.name) > 0) ? String(st.name) : "Empty Preset";
+    String title = isPreview
+        ? String(RadioAudition::getState().name)
+        : ((strlen(st.name) > 0) ? String(st.name) : "Empty Preset");
     _tft.loadFont(NotoSansBold36);
     _tft.setTextColor(TFT_WHITE, COL_CARD, true);
     if (_tft.textWidth(title) <= CARD_INNER_W) {
@@ -136,9 +140,10 @@ void RadioUI::drawStationCard() {
     }
 
     _tft.loadFont(NotoSansBold15);
-    _tft.setTextColor(TFT_YELLOW, COL_CARD, true);
+    _tft.setTextColor(isPreview ? TFT_ORANGE : TFT_YELLOW, COL_CARD, true);
     char badge[BADGE_BUF_LEN];
-    snprintf(badge, sizeof(badge), "FAV %d / %d", favIdx + 1, MAX_FAVOURITES);
+    if (isPreview) snprintf(badge, sizeof(badge), "PREVIEW");
+    else snprintf(badge, sizeof(badge), "FAV %d / %d", favIdx + 1, MAX_FAVOURITES);
     _tft.drawString(badge, 16, 45);
 
     _tft.setTextColor(TFT_LIGHTGREY, COL_CARD, true);

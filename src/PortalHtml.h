@@ -51,31 +51,40 @@ const char HTML_MID_1[] PROGMEM = R"rawliteral(
 
       <div class="card">
         <h2>Community Radio Browser (Global)</h2>
-        <div class="row-wrap">
-          <div class="col-3">
-            <label>Country</label>
-            <select id="rbCountry" onchange="searchRb()"><option value="">Any Country</option></select>
-          </div>
-          <div class="col-3">
-            <label>Genre / Tag</label>
-            <select id="rbTag" onchange="searchRb()"><option value="">Any Genre</option></select>
-          </div>
-          <div class="col-3">
-            <label>Language</label>
-            <select id="rbLang" onchange="searchRb()"><option value="">Any Language</option></select>
-          </div>
-        </div>
-        <label>Station Name Search</label>
+        <label>Step 1: Search by Station Name or Browse Category</label>
         <div class="row">
-          <input type="text" id="rbQ" placeholder="e.g. Jazz, Classic, NPR, SomaFM..." onkeydown="if(event.key==='Enter')searchRb()">
+          <input type="text" id="rbQ" placeholder="Search station name..." onkeydown="if(event.key==='Enter')searchRb()">
           <button class="btn btn-slate btn-inline" onclick="searchRb()">Search</button>
         </div>
-        <label>Select Discovered Station &amp; Save to Target Slot</label>
-        <div class="row">
-          <select id="rbSel"><option value="">Choose filters or click Search...</option></select>
-          <button class="btn btn-green btn-inline" onclick="saveRbSelected()">Save</button>
+        <select id="rbMode" onchange="onRbModeChange()">
+          <option value="country">By Country</option>
+          <option value="tag">By Genre / Tag</option>
+          <option value="lang">By Language</option>
+          <option value="codec">By Codec (MP3 / AAC / FLAC)</option>
+          <option value="topvote">Top Voted Stations</option>
+          <option value="topclick">Most Clicked Stations</option>
+        </select>
+        <select id="rbSub" onchange="searchRb()">
+          <option value="">Loading categories...</option>
+        </select>
+        <label>Step 2: Select Discovered Station</label>
+        <select id="rbSel" onchange="onRbStationSelect()">
+          <option value="">Choose a category or search above...</option>
+        </select>
+        <div id="rbMetaBox" class="hint" style="margin-top:8px;"></div>
+        <div class="row" style="margin-top:10px;">
+          <button id="btnRbPlay" class="btn btn-inline" style="flex:1;" onclick="previewRbSelected()">&#9654; Play Preview</button>
         </div>
-        <p class="hint">Searches radio-browser.info and saves directly to Step 1 Target Slot.</p>
+        <div id="rbAuditionBar" class="aud-bar" style="display:none;">
+          <div id="rbAudTitle" class="aud-title">Auditioning...</div>
+          <div id="rbFullBanner" class="warn-banner" style="display:none;">
+            All 10 favourite slots are full. Delete a preset on the right to enable appending.
+          </div>
+          <div class="row">
+            <button id="btnRbAppend" class="btn btn-green btn-inline" style="flex:1;" onclick="commitRbPreview()">&#43; Append to Favourites &amp; Resume</button>
+            <button class="btn btn-orange btn-inline" style="flex:1;" onclick="stopRbPreview()">&#9632; Stop &amp; Resume</button>
+          </div>
+        </div>
       </div>
     </div>
 
