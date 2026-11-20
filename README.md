@@ -7,7 +7,7 @@ A self-contained, SD-card-free Internet Radio built on the **ESP32-S3 N16R8** (1
 ---
 
 ## Core Acknowledgements & Upstream Libraries
-* **Audio & HLS Engine:** Built upon Wolle's (`schreibfaul1`) **[ESP32-MiniWebRadio](https://github.com)** architecture and **[ESP32-audioI2S](https://github.com)** library for native BBC HLS `.m3u8` playlist parsing, circular PSRAM segment buffering, and I2S audio decoding.
+* **Audio & HLS Engine:** Built upon Wolle's (`schreibfaul1`) **[ESP32-MiniWebRadio](https://github.com)** architecture and **[[ESP32-audioI2S](https://github.com)](https://github.com/schreibfaul1/ESP32-audioI2S)** library for native BBC HLS `.m3u8` playlist parsing, circular PSRAM segment buffering, and I2S audio decoding.
 * **Display & Touch Graphics:** Powered by Bodmer's **[TFT_eSPI](https://github.com)** driving the ILI9341 SPI display with smooth anti-aliased fonts and native XPT2046 touch handling.
 * **Live Stream Sources:**
   * **BBC HLS Streams:** Dynamically fetched and cached in PSRAM from **[bpsib's maintained BBC Radio HLS Gist](https://github.com)** so URLs stay current when BBC CDN paths change.
