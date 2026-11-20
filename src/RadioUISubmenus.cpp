@@ -3,11 +3,12 @@
 #include <examples/Smooth Fonts/FLASH_Array/Font_Demo_1_Array/NotoSansBold36.h>
 
 #define FAV_LABEL_BUF_LEN 40
+#define SLOTS_PER_PAGE    10
+
+uint8_t g_favPage = 0;
 
 // WHAT: Renders the 3-line boot splash card and updates the live progress pill.
 // WHEN: Called in main.cpp setup() during storage init, Wi-Fi connect, and NTP sync.
-// HOW:  Draws the frame and centred title stack once, then overwrites only the status pill.
-// WITH: statusMsg - null-terminated C-string describing the active boot step.
 void RadioUI::showBootScreen(const char* statusMsg) {
     static bool splashDrawn = false;
     if (_screen != SCREEN_MAIN) splashDrawn = false;
@@ -67,36 +68,44 @@ void RadioUI::drawSettingsScreen() {
     _tft.unloadFont();
 }
 
-// WHAT: Draws a 2-column grid of all 10 saved favourite presets for direct tuning.
-// WHEN: Called when the user taps FAVS on the Main Screen.
+// WHAT: Draws a 2-column x 5-row page of wide favourite buttons with Page 1/2 toggle.
+// WHEN: Called when the user taps FAVS or toggles the bottom-right PAGE button.
 void RadioUI::drawFavPreviewScreen() {
     _tft.fillScreen(COL_BG);
     _tft.fillRect(0, 0, 320, 28, TFT_DARKGREEN);
 
     _tft.loadFont(NotoSansBold15);
     _tft.setTextColor(TFT_WHITE, TFT_DARKGREEN, true);
-    _tft.drawString("FAVOURITE PRESETS", 10, 7);
+    _tft.drawString(g_favPage == 0 ? "FAVOURITES (1 - 10)" : "FAVOURITES (11 - 15)", 10, 7);
 
-    for (int i = 0; i < MAX_FAVOURITES; i++) {
+    for (int i = 0; i < SLOTS_PER_PAGE; i++) {
+        int slotIdx = (g_favPage * SLOTS_PER_PAGE) + i;
+        if (slotIdx >= MAX_FAVOURITES) break;
+
         int x = 10 + ((i / 5) * 152);
         int y = 36 + ((i % 5) * 26);
-        bool active = (i == _cfg.getActiveFavIndex());
+        bool active = (slotIdx == _cfg.getActiveFavIndex());
         uint16_t bg = active ? COL_ACCENT : COL_CARD;
         uint16_t fg = active ? TFT_BLACK  : TFT_WHITE;
 
         _tft.fillRoundRect(x, y, 146, 22, 4, bg);
         _tft.setTextColor(fg, bg, true);
 
-        const FavStation& st = _cfg.getFavourite(i);
+        const FavStation& st = _cfg.getFavourite(slotIdx);
         char label[FAV_LABEL_BUF_LEN];
-        snprintf(label, sizeof(label), "%d. %s", i + 1, (strlen(st.name) > 0) ? st.name : "---");
+        snprintf(label, sizeof(label), "%d. %s", slotIdx + 1, (strlen(st.name) > 0) ? st.name : "---");
         _tft.drawString(fitTextToWidth(String(label), FAV_CELL_W), x + 6, y + 4);
     }
 
-    _tft.fillRoundRect(10, 174, 300, 54, 6, COL_BTN);
-    _tft.drawRoundRect(10, 174, 300, 54, 6, COL_ACCENT);
+    _tft.fillRoundRect(10, 174, 146, 54, 6, COL_BTN);
+    _tft.drawRoundRect(10, 174, 146, 54, 6, COL_ACCENT);
     _tft.setTextColor(TFT_WHITE, COL_BTN, true);
-    _tft.drawCentreString("< BACK", 160, 194, 1);
+    _tft.drawCentreString("< BACK", 83, 194, 1);
+
+    _tft.fillRoundRect(164, 174, 146, 54, 6, COL_BTN);
+    _tft.drawRoundRect(164, 174, 146, 54, 6, TFT_YELLOW);
+    _tft.setTextColor(TFT_YELLOW, COL_BTN, true);
+    _tft.drawCentreString(g_favPage == 0 ? "PAGE 1/2 >" : "< PAGE 2/2", 237, 194, 1);
     _tft.unloadFont();
 }
 // END OF FILE

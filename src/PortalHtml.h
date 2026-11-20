@@ -31,13 +31,13 @@ const char HTML_MID_1[] PROGMEM = R"rawliteral(
     <div class="stack">
       <div class="card">
         <h2>Add BBC Station to Favourites</h2>
-        <label>Step 1: Choose Target Favourite Slot (1&ndash;10)</label>
+        <label>Step 1: Choose Target Favourite Slot (1&ndash;15)</label>
         <select id="favSlotSel">
-          <option value="0">Slot 1</option><option value="1">Slot 2</option>
-          <option value="2">Slot 3</option><option value="3">Slot 4</option>
-          <option value="4">Slot 5</option><option value="5">Slot 6</option>
-          <option value="6">Slot 7</option><option value="7">Slot 8</option>
-          <option value="8">Slot 9</option><option value="9">Slot 10</option>
+          <option value="0">Slot 1</option><option value="1">Slot 2</option><option value="2">Slot 3</option>
+          <option value="3">Slot 4</option><option value="4">Slot 5</option><option value="5">Slot 6</option>
+          <option value="6">Slot 7</option><option value="7">Slot 8</option><option value="8">Slot 9</option>
+          <option value="9">Slot 10</option><option value="10">Slot 11</option><option value="11">Slot 12</option>
+          <option value="12">Slot 13</option><option value="13">Slot 14</option><option value="14">Slot 15</option>
         </select>
         <label>Step 2: Filter Live BBC Gist Playlist</label>
         <input type="text" id="q" placeholder="Type e.g. Radio 4, 6 Music, Gloucestershire..." oninput="filterBbc()">
@@ -64,13 +64,9 @@ const char HTML_MID_1[] PROGMEM = R"rawliteral(
           <option value="topvote">Top Voted Stations</option>
           <option value="topclick">Most Clicked Stations</option>
         </select>
-        <select id="rbSub" onchange="searchRb()">
-          <option value="">Loading categories...</option>
-        </select>
+        <select id="rbSub" onchange="searchRb()"><option value="">Loading categories...</option></select>
         <label>Step 2: Select Discovered Station</label>
-        <select id="rbSel" onchange="onRbStationSelect()">
-          <option value="">Choose a category or search above...</option>
-        </select>
+        <select id="rbSel" onchange="onRbStationSelect()"><option value="">Choose a category or search above...</option></select>
         <div id="rbMetaBox" class="hint" style="margin-top:8px;"></div>
         <div class="row" style="margin-top:10px;">
           <button id="btnRbPlay" class="btn btn-inline" style="flex:1;" onclick="previewRbSelected()">&#9654; Play Preview</button>
@@ -78,7 +74,7 @@ const char HTML_MID_1[] PROGMEM = R"rawliteral(
         <div id="rbAuditionBar" class="aud-bar" style="display:none;">
           <div id="rbAudTitle" class="aud-title">Auditioning...</div>
           <div id="rbFullBanner" class="warn-banner" style="display:none;">
-            All 10 favourite slots are full. Delete a preset on the right to enable appending.
+            All 15 favourite slots are full. Delete a preset on the right to enable appending.
           </div>
           <div class="row">
             <button id="btnRbAppend" class="btn btn-green btn-inline" style="flex:1;" onclick="commitRbPreview()">&#43; Append to Favourites &amp; Resume</button>
@@ -89,7 +85,7 @@ const char HTML_MID_1[] PROGMEM = R"rawliteral(
     </div>
 
     <div class="card">
-      <h2>Saved Favourite Presets (Slots 1&ndash;10)</h2>
+      <h2>Saved Favourite Presets (Slots 1&ndash;15)</h2>
       <table id="favTbl"><tr><td style="color:#888;">Loading saved presets...</td></tr></table>
     </div>
   </div>
@@ -135,7 +131,7 @@ const char HTML_FOOT[] PROGMEM = R"rawliteral(
   <div id="tabBackup" class="pane">
     <div class="card">
       <h2>Export Full Configuration</h2>
-      <p class="hint">Downloads a single .json file containing all 10 Wi-Fi networks, 10 Favourite stations, Volume, and Timezone.</p>
+      <p class="hint">Downloads a single .json file containing all 10 Wi-Fi networks, 15 Favourite stations, Volume, and Timezone.</p>
       <a href="/export" class="btn btn-teal">Download Full Backup (.json)</a>
     </div>
     <div class="card">

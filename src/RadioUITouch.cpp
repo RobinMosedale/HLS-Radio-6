@@ -1,5 +1,9 @@
 #include "RadioUI.h"
 
+#define SLOTS_PER_PAGE 10
+
+extern uint8_t g_favPage;
+
 UiAction RadioUI::handleTouch() {
     uint16_t touchX = 0, touchY = 0;
     if (!_tft.getTouch(&touchX, &touchY)) return ACTION_NONE;
@@ -19,7 +23,6 @@ UiAction RadioUI::handleTouch() {
 UiAction RadioUI::handleMainTouch(uint16_t x, uint16_t y) {
     if (x > 274) return ACTION_NONE;
 
-    // 1. Volume Slider Zone (X: 8..272, Y: 116..149)
     if (y >= 116 && y <= 149) {
         int clampedX = constrain(x, 54, 222);
         uint8_t newVol = map(clampedX, 54, 222, 0, 21);
@@ -28,7 +31,6 @@ UiAction RadioUI::handleMainTouch(uint16_t x, uint16_t y) {
         return ACTION_VOLUME_CHANGED;
     }
 
-    // 2. Backlight Brightness Slider Zone (X: 8..272, Y: 150..184)
     if (y >= 150 && y <= 184) {
         int clampedX = constrain(x, 54, 222);
         uint8_t newBrt = map(clampedX, 54, 222, BRT_MIN_PCT, BRT_MAX_PCT);
@@ -37,7 +39,6 @@ UiAction RadioUI::handleMainTouch(uint16_t x, uint16_t y) {
         return ACTION_NONE;
     }
 
-    // 3. Bottom 4 Action Buttons (X: 8..272, Y >= 186)
     if (y >= 186) {
         if (x < 74) {
             int prev = _cfg.getNextValidFav(_cfg.getActiveFavIndex(), -1);
@@ -52,6 +53,7 @@ UiAction RadioUI::handleMainTouch(uint16_t x, uint16_t y) {
             drawStationCard();
             return ACTION_STATION_CHANGED;
         } else if (x < 208) {
+            g_favPage = _cfg.getActiveFavIndex() / SLOTS_PER_PAGE;
             _screen = SCREEN_FAV_PREVIEW;
             drawCurrentScreen();
             return ACTION_NONE;
@@ -82,17 +84,23 @@ UiAction RadioUI::handleFavPreviewTouch(uint16_t x, uint16_t y) {
     if (y >= 36 && y <= 166) {
         int col = (x < 160) ? 0 : 1;
         int row = (y - 36) / 26;
-        int idx = (col * 5) + row;
-        if (idx >= 0 && idx < MAX_FAVOURITES && strlen(_cfg.getFavourite(idx).url) > 0) {
-            _cfg.setActiveFavIndex(idx);
+        int slotIdx = (g_favPage * SLOTS_PER_PAGE) + (col * 5) + row;
+        if (slotIdx >= 0 && slotIdx < MAX_FAVOURITES && strlen(_cfg.getFavourite(slotIdx).url) > 0) {
+            _cfg.setActiveFavIndex(slotIdx);
             _metaText = "Tuning...";
             _screen = SCREEN_MAIN;
             drawCurrentScreen();
             return ACTION_STATION_CHANGED;
         }
     } else if (y >= 174) {
-        _screen = SCREEN_MAIN;
-        drawCurrentScreen();
+        if (x >= 160) {
+            g_favPage = (g_favPage == 0) ? 1 : 0;
+            drawFavPreviewScreen();
+        } else {
+            _screen = SCREEN_MAIN;
+            drawCurrentScreen();
+        }
     }
     return ACTION_NONE;
 }
+// END OF FILE

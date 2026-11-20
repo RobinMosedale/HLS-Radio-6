@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 // --- Array Capacity & Fixed Buffer Lengths ---
-#define MAX_FAVOURITES   10   // Total preset slots (0..9) saved in NVRAM
+#define MAX_FAVOURITES   15   // Total preset slots (0..9) saved in NVRAM
 #define MAX_TIMEZONES    6    // Number of selectable POSIX timezone rules
 #define FAV_NAME_LEN     32   // Max station title length (31 chars + null terminator)
 #define FAV_URL_LEN      256  // Max stream URL length (255 chars + null terminator)
