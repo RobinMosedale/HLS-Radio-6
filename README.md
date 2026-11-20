@@ -27,7 +27,7 @@ A self-contained, SD-card-free Internet Radio built on the **ESP32-S3 N16R8** (1
   * **Station Card & Live Metadata:** Displays active preset badge (`FAV X / 10`), auto-sized station title, and real-time bitrate/stream metadata.
   * **Direct Touch Controls & Stereo VU Meter:** Smooth horizontal touch sliders for Volume (`VOL`) and Screen Brightness (`BRT`), `PREV` / `NEXT` / `FAVS` / `SETUP` navigation buttons, a 10-slot visual preset grid, and a real-time stereo `L`/`R` vertical VU meter.
 * **Responsive Web Management Portal:**
-  * **Live BBC Gist Picker & Favourites Manager:** Search/filter all live BBC national and regional streams, assign to slots 1–10, reorder (`↑` / `↓`), or delete with automatic slot compaction.
+  * **Live BBC Gist Picker & Favourites Manager:** Search/filter all live BBC national and regional streams, assign to slots 1–15, reorder (`↑` / `↓`), or delete with automatic slot compaction.
   * **Wi-Fi Manager & JSON Backup/Restore:** Scan nearby networks, manage 10 Wi-Fi slots, and download or upload a complete `.json` configuration backup.
 
 ![Web Interface](WebInterface.jpg)
