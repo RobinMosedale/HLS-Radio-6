@@ -1,7 +1,6 @@
 # ESP32-S3 Internet Radio (HLS + Global Community Radio)
+
 ![Front Touchscreen UI](TouchScreen.jpg)
-
-
 
 A self-contained, SD-card-free Internet Radio built on the **ESP32-S3 N16R8** (16MB Flash + 8MB OPI PSRAM), pairing a **PCM5102A** I2S stereo DAC with a 2.8" **ILI9341** (320×240) **XPT2046** resistive touchscreen display.
 
@@ -30,7 +29,8 @@ A self-contained, SD-card-free Internet Radio built on the **ESP32-S3 N16R8** (1
 * **Responsive Web Management Portal:**
   * **Live BBC Gist Picker & Favourites Manager:** Search/filter all live BBC national and regional streams, assign to slots 1–10, reorder (`↑` / `↓`), or delete with automatic slot compaction.
   * **Wi-Fi Manager & JSON Backup/Restore:** Scan nearby networks, manage 10 Wi-Fi slots, and download or upload a complete `.json` configuration backup.
-![WebInterface](WebInterface.jpg)
+
+![Web Interface](WebInterface.jpg)
 
 ---
 
@@ -46,3 +46,42 @@ A self-contained, SD-card-free Internet Radio built on the **ESP32-S3 N16R8** (1
   * **Append to Favourites & Resume:** Appends the auditioned station into the next empty NVRAM slot and immediately resumes the interrupted station. Includes full-slot protection that disables appending and displays a warning banner when all 10 slots are occupied.
   * **Stop & Resume:** Cancels the preview from either the web portal or TFT `PREV`/`NEXT` buttons and seamlessly returns to the interrupted favourite station.
 * **Thread-Safe Deferred Stream Tuning:** Decouples HTTP web-portal tune requests from the real-time `ESP32-audioI2S` loop and extends initial connection grace windows for slow-starting HTTPS streams.
+
+---
+
+## Hardware & Wiring
+
+### Components
+* **Microcontroller:** `ESP32-S3-DevKitC-1-N16R8` (16MB Flash, 8MB OPI PSRAM)
+* **Display & Touch:** 2.8" SPI TFT LCD (`MSP2807` / `F22801-A0`, 320×240, ILI9341 driver + XPT2046 resistive touch controller)
+* **Audio DAC:** `GY-PCM5102` (PCM5102A I2S Stereo DAC with 3.5 mm line/headphone jack)
+* **Storage:** SD-card-free design (all settings, Wi-Fi profiles, and presets are stored in ESP32 NVS flash)
+
+### I2S Audio DAC Connections (`ESP32-S3` → `PCM5102A`)
+
+| PCM5102A Pin | ESP32-S3 Pin | Notes |
+| :--- | :--- | :--- |
+| **VIN** | `5V` (or `3.3V`) | Power supply |
+| **GND** | `GND` | Common ground |
+| **DIN** | `GPIO 9` | I2S Serial Data (`I2S_DOUT`) |
+| **BCK** | `GPIO 3` | I2S Bit Clock (`I2S_BCLK`) |
+| **LCK** | `GPIO 1` | I2S Word Select / Left-Right Clock (`I2S_LRC`) |
+| **SCK** | `GND` | Tied to GND to use internal PLL |
+
+### Display & Touch Connections (`ESP32-S3` → `2.8" ILI9341 TFT`)
+
+| TFT Pin (`J2`) | ESP32-S3 Pin | Notes |
+| :--- | :--- | :--- |
+| **VCC** | `3.3V` (or `5V`) | Power supply (check onboard regulator jumper) |
+| **GND** | `GND` | Common ground |
+| **LED** | `GPIO 10` | PWM Backlight control (`TFT_BL`) |
+| **SCK** | `GPIO 17` | Hardware SPI Clock (`TFT_SCLK` @ 27 MHz) |
+| **SDI (MOSI)** | `GPIO 18` | Hardware SPI Data Out (`TFT_MOSI`) |
+| **SDO (MISO)** | `GPIO 2` | Hardware SPI Data In (`TFT_MISO`) |
+| **CS** | `GPIO 8` | Display Chip Select (`TFT_CS`) |
+| **DC** | `GPIO 12` | Data / Command select (`TFT_DC`) |
+| **RESET** | `3.3V` (or `EN`) | Software-disabled (`TFT_RST=-1`), tied high |
+| **T_CLK** | `GPIO 17` | Shared with SPI `SCK` |
+| **T_DIN** | `GPIO 18` | Shared with SPI `MOSI` |
+| **T_DO** | `GPIO 2` | Shared with SPI `MISO` |
+| **T_CS** | `GPIO 15` | XPT2046 Touch Chip Select (`TOUCH_CS` @ 2.5 MHz) |
