@@ -7,11 +7,11 @@ A self-contained, SD-card-free Internet Radio built on the **ESP32-S3 N16R8** (1
 ---
 
 ## Core Acknowledgements & Upstream Libraries
-* **Audio & HLS Engine:** Built upon Wolle's (`schreibfaul1`) **[ESP32-MiniWebRadio](https://github.com)** architecture and **(https://github.com/schreibfaul1/ESP32-audioI2S)** library for native BBC HLS `.m3u8` playlist parsing, circular PSRAM segment buffering, and I2S audio decoding.
+* **Audio & HLS Engine:** Built upon Wolle's (`schreibfaul1`) **https://github.com/schreibfaul1/ESP32-MiniWebRadio** architecture and **(https://github.com/schreibfaul1/ESP32-audioI2S)** library for native BBC HLS `.m3u8` playlist parsing, circular PSRAM segment buffering, and I2S audio decoding.
 * **Display & Touch Graphics:** Powered by Bodmer's ** https://github.com/Bodmer/TFT_eSPI** driving the ILI9341 SPI display with smooth anti-aliased fonts and native XPT2046 touch handling.
 * **Live Stream Sources:**
-  * **BBC HLS Streams:** Dynamically fetched and cached in PSRAM from **[bpsib's maintained BBC Radio HLS Gist](https://github.com)** so URLs stay current when BBC CDN paths change.
-  * **Global Stations (Version 2+):** Powered by **[radio-browser.info](https://radio-browser.info)** with multi-mirror failover.
+  * **BBC HLS Streams:** Dynamically fetched and cached in PSRAM from **https://gist.github.com/bpsib/67089b959e4fa898af69fea59ad74bc3** so URLs stay current when BBC CDN paths change.
+  * **Global Stations (Version 2+):** Powered by **https://www.radio-browser.info/** with multi-mirror failover.
 
 ---
 
