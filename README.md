@@ -30,6 +30,7 @@ A self-contained, SD-card-free Internet Radio built on the **ESP32-S3 N16R8** (1
 * **Responsive Web Management Portal:**
   * **Live BBC Gist Picker & Favourites Manager:** Search/filter all live BBC national and regional streams, assign to slots 1–10, reorder (`↑` / `↓`), or delete with automatic slot compaction.
   * **Wi-Fi Manager & JSON Backup/Restore:** Scan nearby networks, manage 10 Wi-Fi slots, and download or upload a complete `.json` configuration backup.
+![WebInterface](WebInterface.jpg)
 
 ---
 
