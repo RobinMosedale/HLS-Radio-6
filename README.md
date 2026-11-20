@@ -37,7 +37,7 @@ A self-contained, SD-card-free Internet Radio built on the **ESP32-S3 N16R8** (1
 ## Version 2 (`version-2` / `dev`) — Full BBC HLS + Global Community Radio Browser
 > **Retains all Version 1 capabilities while adding global station discovery via [radio-browser.info](https://radio-browser.info) and a non-destructive Audition, Append & Resume workflow.**
 
-* **Global Community Radio Browser:** Inspired by Wolle's progressive category browsing in **[ESP32-MiniWebRadio](https://github.com)**, the web portal queries `radio-browser.info` directly with automatic mirror failover (`de2` / `fi1` / `de1`), showing codec and bitrate tags (e.g., `[MP3 128k]`, `[AAC 96k]`) across:
+* **Global Community Radio Browser:** Inspired by Wolle's progressive category browsing in **https://github.com/schreibfaul1/ESP32-MiniWebRadio**, the web portal queries `radio-browser.info` directly with automatic mirror failover (`de2` / `fi1` / `de1`), showing codec and bitrate tags (e.g., `[MP3 128k]`, `[AAC 96k]`) across:
   * **By Country** (alphabetical A–Z with ISO country codes and station counts)
   * **By Genre / Tag**, **By Language**, and **By Codec** (MP3, AAC, AAC+, OGG, FLAC)
   * **Top Voted**, **Most Clicked**, and **Free-Text Station Name Search**
